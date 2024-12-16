@@ -35,7 +35,25 @@ router.get("/:id", (req, res) => {
         .json({ message: "The post information could not be retrieved" });
     });
 });
-router.post("/", (req, res) => {});
+router.post("/", (req, res) => {
+  const { title, contents } = req.body;
+  if (!title || !contents) {
+    res
+      .status(400)
+      .json({ message: "Please provide title and contents for the post" });
+  } else {
+    Post.insert({ title, contents })
+      .then((post) => {
+        res.status(201).json(post);
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).json({
+          message: "There was an error while saving the post to the database",
+        });
+      });
+  }
+});
 router.delete("/:id", (req, res) => {});
 router.put("/:id", (req, res) => {});
 router.get("/:id/comments", (req, res) => {});
