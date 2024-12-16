@@ -4,6 +4,7 @@ const Post = require("./posts-model");
 
 const router = express.Router();
 
+// find()
 router.get("/", (req, res) => {
   Post.find(req.query)
     .then((posts) => {
@@ -17,6 +18,7 @@ router.get("/", (req, res) => {
     });
 });
 
+// findById()
 router.get("/:id", (req, res) => {
   Post.findById(req.params.id)
     .then((post) => {
@@ -35,6 +37,8 @@ router.get("/:id", (req, res) => {
         .json({ message: "The post information could not be retrieved" });
     });
 });
+
+// insert()
 router.post("/", (req, res) => {
   const { title, contents } = req.body;
   if (!title || !contents) {
@@ -55,8 +59,31 @@ router.post("/", (req, res) => {
       });
   }
 });
-router.delete("/:id", (req, res) => {});
+
+// update()
 router.put("/:id", (req, res) => {});
+
+// remove()
+// .catch(error = {
+//     res.status(500).json({ message: "The post could not be removed" })
+// })
+router.delete("/:id", async (req, res) => {
+  try {
+    const postId = await Post.findById(req.params.id);
+    if (!postId) {
+      res
+        .status(404)
+        .json({ message: "The post with the specified ID does not exist" });
+    } else {
+      await Post.remove(req.params.id);
+      res.json(postId);
+    }
+  } catch (error) {
+    res.status(500).json({ message: "The post could not be removed" });
+  }
+});
+
+// findPostComments()
 router.get("/:id/comments", (req, res) => {});
 
 module.exports = router;
